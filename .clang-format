@@ -1,0 +1,13 @@
+BasedOnStyle: Google
+AllowShortLoopsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: true
+
+IncludeCategories:
+  - Regex:    '^".*'
+    Priority: 0
+  - Regex:    '^<(oneapi|tbb|fmt|google)'
+    Priority: 2
+  - Regex:    '^<[a-z_]*>$'
+    Priority: 3
+  - Regex:    '.*'
+    Priority: 4

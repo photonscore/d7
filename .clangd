@@ -1,0 +1,10 @@
+# clangd settings for the D7 project.
+#
+# Include paths are NOT set here: clangd resolves a .clangd CompileFlags.Add
+# block relative to each source file's own directory, so repo-root includes
+# like "photonscore/..." cannot be expressed with a single relative -I.
+# Instead the (relative) compile flags live in compile_flags.txt, which
+# clangd resolves relative to the repo root. Run `bazel build //...` once so
+# the generated *.pb.h under bazel-bin exist.
+Diagnostics:
+  UnusedIncludes: None

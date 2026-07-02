@@ -1,0 +1,81 @@
+// Copyright (c) 2026 Photonscore GmbH
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+import "photonscore/proto/base.proto";
+
+package photonscore.d7.backend.seven;
+
+message Header {
+  message DatasetInfo {
+    string name = 1;
+    photonscore.base.TypeCode type = 2;
+    repeated uint64 size = 3;
+
+    //
+    // This field is deprecated in favour of Header.bytes_per_page. If the later
+    // field is not set use kPageSize, e.g. 16K. This would allow reading of
+    // already recorded files.
+    //
+    // uint32 items_per_page = 4;
+  }
+
+  string signatue = 1;       // "D7 Photons Data"
+  uint32 version_major = 2;  // 1
+  uint32 version_minor = 3;  // always 0
+  uint32 version_patch = 4;  // 1
+  uint32 index_step = 6;     // 512, in 16K blocks it's 8M
+  uint32 bytes_per_page = 8;
+
+  repeated DatasetInfo toc = 7;
+}
+
+message Data {
+  uint32 dataset_id = 1;
+
+  // Diff encoded data for INT* and UINT* data types.
+  sint64 seed = 3;
+  repeated sint32 integers = 4;
+  repeated sint64 longs = 5;
+
+  // Raw data for floats and bytes
+  repeated float floats = 6;
+  repeated double doubles = 7;
+  bytes raw_bytes = 8;
+}
+
+message Epilogue {
+  uint64 global_index_offset = 1;  // From the beginning of the file
+  string signatue = 2;             // End of D7 Photons Data File
+}
+
+message Index {
+  message DataInfo {
+    uint32 dataset_id = 1;
+    uint64 offset = 2;  // Offset from the beginning of the file
+  }
+
+  repeated DataInfo data_info = 1;
+  map<string, string> attributes = 2;
+}
+
+message FileEntry {
+  oneof payload {
+    Header header = 1;
+    Data data = 2;
+    Index index = 3;
+    Epilogue epilogue = 4;
+  }
+}

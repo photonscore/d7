@@ -1,0 +1,14 @@
+# Standalone D7 build configuration.
+
+# This project uses the classic WORKSPACE dependency model; all deps are
+# vendored under //third_party. Disable bzlmod so Bazel 7+ uses WORKSPACE.
+common --enable_bzlmod=false
+
+# The C++ sources require C++17.
+build --cxxopt=-std=c++17
+build --host_cxxopt=-std=c++17
+
+# Always build optimized by default for the vendored numeric/IO code.
+build --compilation_mode=opt
+
+# vim:ft=bzl

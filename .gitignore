@@ -1,0 +1,7 @@
+# Bazel
+/bazel-*
+.*.swp
+.DS_Store
+._*
+*~
+.vs/

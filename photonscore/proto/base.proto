@@ -1,0 +1,112 @@
+// Copyright (c) 2026 Photonscore GmbH
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package photonscore.base;
+option go_package = "photonscore/go/proto/base";
+option csharp_namespace = "Photonscore.Proto.Base";
+
+enum TypeCode {
+  option allow_alias = true;
+
+  INT8 = 0;
+  INT16 = 1;
+  INT32 = 2;
+  INT64 = 3;
+
+  UINT8 = 4;
+  UINT16 = 5;
+  UINT32 = 6;
+  UINT64 = 7;
+
+  FLOAT32 = 8;
+  SINGLE = 8;
+
+  FLOAT64 = 9;
+  DOUBLE = 9;
+
+  STRING = 11;
+  DATE_TIME = 12;
+  DURATION = 13;
+
+  GUID = 14;
+  UUID = 14;
+
+  UNDEFINED = 100;
+}
+
+// Corresponds to .NET implementation of System.DateTime stucture.
+message DateTimeMessage {
+  // Represents the number of 100-nanosecond intervals that have elapsed since
+  // 12:00:00 midnight, January 1, 0001 (0:00:00 UTC on January 1, 0001, in the
+  // Gregorian calendar).
+  int64 ticks = 1;
+}
+
+// Empty message
+message Nothing {}
+
+message Any {
+  // Schema points to protobuf type or can be a string from type code, for
+  // example:
+  //  - int16
+  //  - uint32[10]
+  //  - float[15][25]
+  string schema = 1;
+  bytes data = 2;
+}
+
+message Matrix {
+  TypeCode type = 1;
+  int32 rows = 2;
+  int32 cols = 3;
+
+  // Cols major storage
+  bytes data = 4;
+}
+
+message Array {
+  enum Type {
+    option allow_alias = true;
+
+    INT8 = 0;
+    INT16 = 1;
+    INT32 = 2;
+    INT64 = 3;
+
+    UINT8 = 4;
+    UINT16 = 5;
+    UINT32 = 6;
+    UINT64 = 7;
+
+    FLOAT32 = 8;
+    SINGLE = 8;
+
+    FLOAT64 = 9;
+    DOUBLE = 9;
+  }
+
+  Type type = 1;
+  repeated uint32 dims = 2;
+  bytes data = 3;
+}
+
+message ListOfInt32 {
+  repeated int32 values = 1;
+}
+
+message ListOfUInt32 {
+  repeated uint32 values = 1;
+}

@@ -1,0 +1,10 @@
+-xc++
+-std=c++17
+-I.
+-Ibazel-bin
+-isystem
+third_party/fmt
+-isystem
+third_party/oneTBB/include
+-isystem
+third_party/protobuf/src
