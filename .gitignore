@@ -16,6 +16,10 @@
 ._*
 *~
 
+# Test fixtures, fetched by configure.py
+/photonscore/lib/d7/test/data/*.photons
+
 # dotnet
 bin/
 obj/
+/.dotnet/
