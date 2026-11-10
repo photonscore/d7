@@ -12,6 +12,30 @@ at the exact version of the vendored protobuf runtime, and the .NET SDK
 when the machine has no suitable one. Each file is pinned by version and
 hash, and goes inside the checkout, nowhere else.
 
+## Install
+
+Nothing below needs this repository built.
+
+**.NET**: [Photonscore.D7](https://www.nuget.org/packages/Photonscore.D7)
+on NuGet, managed code only, for .NET 8 and .NET 10:
+
+```sh
+dotnet add package Photonscore.D7
+```
+
+Its [README](dotnet/Photonscore.D7/README.md) shows reading and writing.
+
+**Python**: `photonscore-d7` on PyPI, with NumPy as its only dependency.
+It is not published yet; once it is:
+
+```sh
+pip install photonscore-d7
+```
+
+**C and C++**: build from source, below. The C API
+([`c_api.h`](photonscore/lib/d7/c_api.h)) and its shared library suit
+any language with a foreign-function interface.
+
 ## Building
 
 ### Without a Python of your own
