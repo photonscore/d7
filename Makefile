@@ -33,7 +33,8 @@ else
 endif
 
 INCLUDES := -I. -Igen -isystem third_party/fmt \
-  -isystem third_party/oneTBB/include -isystem third_party/protobuf/src
+  -isystem third_party/oneTBB/include -isystem third_party/protobuf/src \
+  -isystem third_party/googletest/src
 DEFINES := -D__TBB_NO_IMPLICIT_LINKAGE
 ALL_FLAGS := -std=c++17 -fPIC -fvisibility=hidden -MMD -MP $(CXXFLAGS) \
   $(INCLUDES) $(DEFINES)
@@ -48,19 +49,23 @@ PB_SRCS := $(foreach d,$(PB_DIRS), \
   $(wildcard third_party/protobuf/src/google/protobuf/$(d)/*.cc))
 TBB_SRCS := $(wildcard third_party/oneTBB/src/tbb/*.cpp)
 FMT_SRCS := $(wildcard third_party/fmt/fmt/*.cc)
+GTEST_SRCS := $(wildcard third_party/googletest/src/*.cc)
+TEST_SRCS := $(wildcard photonscore/lib/d7/test/*_test.cc)
 
 obj = $(patsubst %,$(BUILD)/obj/%.o,$(basename $(1)))
 LIB_OBJS := $(call obj,$(D7_SRCS) $(GEN_SRCS) $(PB_SRCS) $(TBB_SRCS) \
   $(FMT_SRCS))
 CAPI_OBJ := $(call obj,photonscore/lib/d7/c_api.cc)
+TEST_OBJS := $(call obj,$(TEST_SRCS) $(GTEST_SRCS))
 
 STATIC := $(BUILD)/libd7.a
 SHARED := $(BUILD)/libphotonscore_d7.$(SHARED_EXT)
 EXAMPLES := write_demo list_metadata read_n_events
 C_API_EXAMPLES := list_metadata_c_api read_n_events_c_api
 BINS := $(addprefix $(BUILD)/,$(EXAMPLES) $(C_API_EXAMPLES))
+TEST_BIN := $(BUILD)/d7_test
 
-.PHONY: all clean
+.PHONY: all clean test
 all: $(STATIC) $(SHARED) $(BINS)
 
 ifeq ($(wildcard $(GEN_SRCS))$(filter clean,$(MAKECMDGOALS)),)
@@ -82,6 +87,14 @@ $(addprefix $(BUILD)/,$(C_API_EXAMPLES)): $(BUILD)/%: \
     $(BUILD)/obj/examples/%.o $(SHARED)
 	$(CXX) -o $@ $< -L$(BUILD) -lphotonscore_d7 $(RPATH)
 
+# The tests write their files into the working folder: a fresh one
+test: $(TEST_BIN)
+	@rm -rf $(BUILD)/test-run && mkdir -p $(BUILD)/test-run
+	cd $(BUILD)/test-run && ../d7_test
+
+$(TEST_BIN): $(TEST_OBJS) $(STATIC)
+	$(CXX) -o $@ $^ $(LIBS)
+
 $(BUILD)/obj/examples/%_c_api.o: examples/%_c_api.cc
 	@mkdir -p $(dir $@)
 	$(CXX) $(ALL_FLAGS) -DPSCR_D7_IMPORT -c $< -o $@
@@ -100,6 +113,10 @@ $(BUILD)/obj/third_party/oneTBB/%.o: third_party/oneTBB/%.cpp
 	  -D__TBB_DYNAMIC_LOAD_ENABLED=0 -D__TBB_SOURCE_DIRECTLY_INCLUDED=1 \
 	  -w -c $< -o $@
 
+$(BUILD)/obj/third_party/googletest/%.o: third_party/googletest/%.cc
+	@mkdir -p $(dir $@)
+	$(CXX) $(ALL_FLAGS) -Ithird_party/googletest -w -c $< -o $@
+
 $(BUILD)/obj/third_party/fmt/%.o: third_party/fmt/%.cc
 	@mkdir -p $(dir $@)
 	$(CXX) $(ALL_FLAGS) -w -c $< -o $@
@@ -111,4 +128,4 @@ $(BUILD)/obj/%.o: %.cc
 clean:
 	rm -rf $(BUILD)
 
--include $(LIB_OBJS:.o=.d) $(CAPI_OBJ:.o=.d)
+-include $(LIB_OBJS:.o=.d) $(CAPI_OBJ:.o=.d) $(TEST_OBJS:.o=.d)

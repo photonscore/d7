@@ -18,7 +18,7 @@
   <!-- Objects keep their source folders: several sources share a name. -->
   <ItemGroup>
     <ClCompile Include="..\photonscore\lib\**\*.cc"
-               Exclude="..\photonscore\lib\d7\c_api.cc">
+               Exclude="..\photonscore\lib\d7\c_api.cc;..\photonscore\lib\d7\test\**">
       <ObjectFileName>$(IntDir)d7\%(RecursiveDir)</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\gen\**\*.pb.cc">

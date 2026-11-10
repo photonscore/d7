@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- d7_test.exe: the C++ tests over libd7 and googletest. Run it from an
+     empty folder: the tests write their files into the working one. -->
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Import Project="config.props" />
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6B1D2A8E-3C47-4F59-9E21-7D0A5C3B1E08}</ProjectGuid>
+    <RootNamespace>d7_test</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="common.props" />
+
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(D7Root)third_party\googletest\src;$(D7Root)third_party\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
+  <ItemGroup>
+    <ClCompile Include="..\photonscore\lib\d7\test\*_test.cc" />
+    <ClCompile Include="..\third_party\googletest\src\*.cc">
+      <ObjectFileName>$(IntDir)googletest\</ObjectFileName>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+    </ClCompile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="d7.vcxproj">
+      <Project>{6B1D2A8E-3C47-4F59-9E21-7D0A5C3B1E01}</Project>
+    </ProjectReference>
+  </ItemGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>
