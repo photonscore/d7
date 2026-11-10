@@ -10,6 +10,10 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <!-- bin/ and obj/ of every project under out/dotnet/ -->
     <ArtifactsPath>$(MSBuildThisFileDirectory)../out/dotnet</ArtifactsPath>
+    <!-- zoo's suite version at the sync, the packages' as well -->
+    <Version>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)../VERSION.txt').Trim())</Version>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
 </Project>
