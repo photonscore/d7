@@ -6,17 +6,38 @@ open-source reference implementation of the native D7 reader/writer for the
 "seven" container, without the legacy HDF5 / SQLite / directory-bundle /
 QAdata backends.
 
-Every dependency is vendored under [`third_party/`](third_party). The one
-thing fetched is `protoc`, which `configure.py` downloads at the exact
-version of the vendored protobuf runtime and checks against a pinned
-SHA-256.
+Every dependency of the C++ library is vendored under
+[`third_party/`](third_party). What is not, `configure.py` fetches: protoc
+at the exact version of the vendored protobuf runtime, the .NET SDK when
+the machine has no suitable one, and the test fixtures on request. Each
+file is pinned by version and hash, and goes inside the checkout, nowhere
+else.
 
 ## Building
 
 Run `configure.py` once per checkout. It needs Python 3.9 or later and
-nothing beyond the standard library. It fetches protoc into `.cache/`,
-generates the protobuf code into `gen/`, and on Windows sets the projects
-up for the Visual Studio it finds.
+nothing beyond the standard library. It lists what it would download,
+with sizes, and asks before fetching anything:
+
+```
+configure.py will download, into this checkout only:
+  - protoc 3.20.1 (linux-x86_64)        1.7 MB  -> .cache/
+  - .NET SDK 10.0.403 (linux-x64)     240.2 MB  -> third_party/dotnet/
+  - .NET runtime 8.0.33 (linux-x64)    31.3 MB  -> third_party/dotnet/
+                              total   273.2 MB
+Proceed? [y/N]
+```
+
+| Option | Effect |
+| --- | --- |
+| `--tests` | Also fetch the test fixtures into `photonscore/lib/d7/test/data/`. |
+| `--no-dotnet` | Skip .NET: the native library only. |
+| `--yes` | Download without asking, as CI does. |
+
+A machine's own dotnet is used when it has an SDK 10 or later and the
+8.0 runtime; otherwise the pinned ones go into `third_party/dotnet/`.
+configure.py then generates the protobuf code into `gen/`, and on
+Windows sets the projects up for the Visual Studio it finds.
 
 **Linux and macOS** need a C++17 compiler and GNU make:
 
@@ -33,8 +54,8 @@ python configure.py
 msbuild d7.sln -m -p:Configuration=Release -p:Platform=x64
 ```
 
-`d7.sln` opens in Visual Studio as well. Everything lands in `build/`
-(`build\x64\Release\` on Windows):
+`d7.sln` opens in Visual Studio as well. Everything built lands in `out/`
+(`out\x64\Release\` on Windows; .NET's under `out/dotnet/`):
 
 | Output | What it is |
 | --- | --- |
@@ -51,9 +72,9 @@ msbuild d7.sln -m -p:Configuration=Release -p:Platform=x64
 Write a small sample file, then inspect it and read it back:
 
 ```sh
-build/write_demo    /tmp/sample.photons
-build/list_metadata /tmp/sample.photons
-build/read_n_events /tmp/sample.photons 5
+out/write_demo    /tmp/sample.photons
+out/list_metadata /tmp/sample.photons
+out/read_n_events /tmp/sample.photons 5
 ```
 
 ## Using the library
@@ -122,13 +143,18 @@ photonscore/
     d7/       the D7 reader/writer + C API + seven.proto
   proto/      shared protobuf definitions (base.proto)
 examples/     C++ and C-API usage examples (write_demo, list_metadata, read_n_events)
+dotnet/
+  Photonscore.D7/  the managed reader and writer (net8.0, net10.0)
+  Test.D7/         its tests
 third_party/
   fmt/        {fmt} formatting library      (MIT)
   oneTBB/     Intel oneAPI TBB              (Apache-2.0)
   protobuf/   Protocol Buffers runtime      (BSD-3-Clause)
+  dotnet/     the .NET SDK, when configure.py fetched one (not tracked)
 msvc/         Visual Studio projects of d7.sln
-configure.py  protoc, gen/ and the Visual Studio setup
+configure.py  downloads, gen/ and the Visual Studio setup
 Makefile      the Linux and macOS build
+out/          everything built (not tracked)
 ```
 
 ## File format
