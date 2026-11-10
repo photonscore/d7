@@ -1,0 +1,52 @@
+# Publishes a release: a tag v<VERSION.txt> pushes Photonscore.D7 to
+# nuget.org by trusted publishing, no stored key. The PyPI job joins when
+# the Python package exists (photonscore-d7, environment pypi).
+#
+# The repository variable NUGET_USER holds the nuget.org account name
+# whose trusted-publishing policy names this workflow file.
+
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  nuget:
+    runs-on: ubuntu-latest
+    environment: nuget
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: The tag is VERSION.txt
+        run: |
+          test "$GITHUB_REF_NAME" = "v$(cat VERSION.txt)" || {
+            echo "tag $GITHUB_REF_NAME, VERSION.txt $(cat VERSION.txt)" >&2
+            exit 1
+          }
+      - name: Bootstrap Python
+        run: ./bootstrap.sh --yes
+      - name: Configure
+        run: . ./env.sh && python configure.py --yes
+      - name: Test
+        run: . ./env.sh && dotnet test dotnet/Test.D7 -c Release
+      - name: Pack
+        run: >-
+          . ./env.sh &&
+          dotnet pack dotnet/Photonscore.D7 -c Release -o out/nuget
+      - name: Log in to nuget.org
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+      - name: Push
+        run: >-
+          . ./env.sh &&
+          dotnet nuget push "out/nuget/*.nupkg"
+          --api-key "${{ steps.login.outputs.NUGET_API_KEY }}"
+          --source https://api.nuget.org/v3/index.json
