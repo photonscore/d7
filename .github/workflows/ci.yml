@@ -1,6 +1,5 @@
 # Builds and tests d7 the way the README says, on all three systems: the
-# bootstrap's Python, configure.py with the fixtures from
-# files.photonscore.de, make or MSBuild, and dotnet.
+# bootstrap's Python, configure.py, make or MSBuild, and dotnet.
 
 name: ci
 
@@ -23,7 +22,7 @@ jobs:
       - name: Bootstrap Python
         run: ./bootstrap.sh --yes
       - name: Configure
-        run: . ./env.sh && python configure.py --yes --tests
+        run: . ./env.sh && python configure.py --yes
       - name: Build
         run: make -j4
       - name: C++ tests
@@ -42,7 +41,7 @@ jobs:
       - name: Bootstrap Python
         run: .\bootstrap.cmd --yes
       - name: Configure
-        run: call .\env.cmd && python configure.py --yes --tests
+        run: call .\env.cmd && python configure.py --yes
       - name: Build
         run: msbuild d7.sln -m -p:Configuration=Release -p:Platform=x64
       - name: C++ tests

@@ -15,7 +15,7 @@
 """Prepares a d7 checkout for `make`, `msbuild d7.sln` and `dotnet`.
 
 Lists what it would download (protoc; the .NET SDK unless the machine
-has a suitable one; the test fixtures with --tests), asks once, then
+has a suitable one), asks once, then
 fetches each pinned file, checks its hash and installs it inside the
 checkout. Nothing is written outside it. Standard library only, Python
 3.9 and later.
@@ -38,7 +38,6 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 CACHE = os.path.join(ROOT, ".cache")
 GEN = os.path.join(ROOT, "gen")
 DOTNET_HOME = os.path.join(ROOT, "third_party", "dotnet")
-FIXTURE_DIR = os.path.join(ROOT, "photonscore", "lib", "d7", "test", "data")
 PROTOS = [
   "photonscore/proto/base.proto",
   "photonscore/lib/d7/backend/seven/seven.proto",
@@ -102,18 +101,6 @@ DOTNET = {
       "a9ba25eae72f98e25233ae202d6e4fb6663b2c8da23bcd9d797c89e8b1d01f51"
       "de90f1994dc7101a5fef56db401c05af184c5e251a9bce570adf044c4e3ae5a9"),
   }),
-}
-
-# Where the fixtures are published; --fixtures-from overrides it.
-FIXTURES_URL = "https://files.photonscore.de/data/d7-tests"
-# The test fixtures: size, SHA-256.
-FIXTURES = {
-  "d7.photons": (3145766,
-    "372c7065bbd23fbb472d1bce3e4e4230162bc149a4c5414546cd8efab86d7d45"),
-  "data.photons": (270336,
-    "46cc58e08655c1f61b1cdc3126d5336da063a4a0dc1a6e6db2dfe65c4a9c59c3"),
-  "v0.photons": (1411072,
-    "02b350fdfa3f39223a284e651e5492d81c557f8d2e795d091c87f7723a7b4d6e"),
 }
 
 # Visual Studio major version to its C++ platform toolset.
@@ -324,31 +311,6 @@ def extract_into_dotnet_home(path):
     t.extractall(DOTNET_HOME, **kw)
 
 
-# Fixtures -------------------------------------------------------------
-
-def fixtures(source):
-  todo = []
-  for name, (size, digest) in FIXTURES.items():
-    dst = os.path.join(FIXTURE_DIR, name)
-    if os.path.isfile(dst) and sha("sha256", dst) == digest:
-      continue
-    if not source:
-      fail("no fixture source: pass --fixtures-from with a folder or URL "
-           "holding " + ", ".join(FIXTURES))
-    if os.path.isdir(source):
-      url = os.path.join(source, name)
-    else:
-      url = source.rstrip("/") + "/" + name
-
-    def install(path, dst=dst):
-      os.makedirs(FIXTURE_DIR, exist_ok=True)
-      shutil.copyfile(path, dst)
-
-    todo.append(Download("test fixture " + name, url, size, "sha256",
-                         digest, install, FIXTURE_DIR))
-  return todo
-
-
 # Visual Studio --------------------------------------------------------
 
 def find_vs():
@@ -414,13 +376,8 @@ def confirm(todo, yes):
 
 def main():
   p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-  p.add_argument("--tests", action="store_true",
-                 help="also fetch the test fixtures")
   p.add_argument("--no-dotnet", action="store_true",
                  help="skip .NET: build the native library only")
-  p.add_argument("--fixtures-from", metavar="DIR_OR_URL",
-                 default=FIXTURES_URL,
-                 help="where the fixtures come from")
   p.add_argument("--yes", action="store_true",
                  help="download without asking (CI)")
   args = p.parse_args()
@@ -432,8 +389,6 @@ def main():
   if not args.no_dotnet:
     dotnet_exe, dotnet_downloads = dotnet()
     todo += dotnet_downloads
-  if args.tests:
-    todo += fixtures(args.fixtures_from)
 
   if todo:
     confirm(todo, args.yes)

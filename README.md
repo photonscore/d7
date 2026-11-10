@@ -8,10 +8,9 @@ QAdata backends.
 
 Every dependency of the C++ library is vendored under
 [`third_party/`](third_party). What is not, `configure.py` fetches: protoc
-at the exact version of the vendored protobuf runtime, the .NET SDK when
-the machine has no suitable one, and the test fixtures on request. Each
-file is pinned by version and hash, and goes inside the checkout, nowhere
-else.
+at the exact version of the vendored protobuf runtime, and the .NET SDK
+when the machine has no suitable one. Each file is pinned by version and
+hash, and goes inside the checkout, nowhere else.
 
 ## Building
 
@@ -55,8 +54,6 @@ Proceed? [y/N]
 
 | Option | Effect |
 | --- | --- |
-| `--tests` | Also fetch the test fixtures from [files.photonscore.de](https://files.photonscore.de/data/d7-tests/) into `photonscore/lib/d7/test/data/`. |
-| `--fixtures-from DIR_OR_URL` | Take the fixtures from elsewhere; they are checked all the same. |
 | `--no-dotnet` | Skip .NET: the native library only. |
 | `--yes` | Download without asking, as CI does. |
 
@@ -105,14 +102,16 @@ out/read_n_events /tmp/sample.photons 5
 
 ### Run the tests
 
-The C++ tests (googletest) need no fixtures. `make test` runs them in a
-fresh `out/test-run/`; on Windows, `msbuild` builds `d7_test.exe` too:
+`make test` runs the C++ tests (googletest) in a fresh `out/test-run/`;
+on Windows, `msbuild` builds `d7_test.exe` too:
 
 ```bat
 mkdir out\test-run && cd out\test-run && ..\x64\Release\d7_test.exe
 ```
 
-The .NET tests read the fixtures that `configure.py --tests` fetches:
+The .NET tests also read a real recording,
+[`d7.photons`](photonscore/lib/d7/test/data/d7.photons) (3.1 MB,
+LnTCapture, 2019):
 
 ```sh
 dotnet test dotnet/Test.D7
