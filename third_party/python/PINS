@@ -1,0 +1,27 @@
+# python-build-standalone release 20261026, install_only builds.
+# minor  target  sha256  size  file -- read by bootstrap.sh and .cmd
+3.11 x86_64-pc-windows-msvc 75cb501dc11c7b55c6b447c58e4910bce5b1f609f1017328b4f3a858dfaf5428 48749854 cpython-3.11.18+20261026-x86_64-pc-windows-msvc-install_only.tar.gz
+3.11 aarch64-apple-darwin cba3455e18516fbe8668cff2820c9b6a53447c552d612443c2b2fb60d390a908 26901713 cpython-3.11.18+20261026-aarch64-apple-darwin-install_only.tar.gz
+3.11 x86_64-apple-darwin a85474bcc78a98ca6b0070d8d615b0494b912b960239e6f18cc12d648f2dc270 26812919 cpython-3.11.18+20261026-x86_64-apple-darwin-install_only.tar.gz
+3.11 x86_64-unknown-linux-gnu a87ee63646c8f8438b7af3954b2135ed2af91d033c631f12a8f20af903046d06 49036443 cpython-3.11.18+20261026-x86_64-unknown-linux-gnu-install_only.tar.gz
+3.11 aarch64-unknown-linux-gnu a344c887b04a309f292cac1ef7c7a85e39e11932ec301d635258c569d830861b 49263049 cpython-3.11.18+20261026-aarch64-unknown-linux-gnu-install_only.tar.gz
+3.12 x86_64-pc-windows-msvc 590dfcbe3a34c07301e6332e13e2188b98655cd072b08afa45a7998dc4c22bc5 47113364 cpython-3.12.16+20261026-x86_64-pc-windows-msvc-install_only.tar.gz
+3.12 aarch64-apple-darwin fbf4afef53c2a6b72bb741bc06d5671a9dfaf87bd84e5aa73ac9b3d0d589f14e 25172086 cpython-3.12.16+20261026-aarch64-apple-darwin-install_only.tar.gz
+3.12 x86_64-apple-darwin a962e47df522889eaa7ff0d6a56203f1079f68aabb65ffdbe8455f362bc769f3 24873291 cpython-3.12.16+20261026-x86_64-apple-darwin-install_only.tar.gz
+3.12 x86_64-unknown-linux-gnu 6a79e922e50006b601f29e688407659da1c2b86ebcd4e9c7254cf234be8b89de 67921566 cpython-3.12.16+20261026-x86_64-unknown-linux-gnu-install_only.tar.gz
+3.12 aarch64-unknown-linux-gnu a945427411dc6851a1393533b74a4a1ac434321ae397f2ec69897a9b4fde032b 53051192 cpython-3.12.16+20261026-aarch64-unknown-linux-gnu-install_only.tar.gz
+3.13 x86_64-pc-windows-msvc ebe90cc1dce2dd2d7afa1f0aa9b6c269c7c0174aeabdc6a801381602b7283424 48077770 cpython-3.13.18+20261026-x86_64-pc-windows-msvc-install_only.tar.gz
+3.13 aarch64-apple-darwin e5af2fde6a937a0e0c795a0c595c4efb70578d57463a2657c819992b9b9acbac 25394044 cpython-3.13.18+20261026-aarch64-apple-darwin-install_only.tar.gz
+3.13 x86_64-apple-darwin 708be9e7df297f68bdae589ea9e62a621db5abe7708f79e851c41410347452d1 25155145 cpython-3.13.18+20261026-x86_64-apple-darwin-install_only.tar.gz
+3.13 x86_64-unknown-linux-gnu 126343c54daff4068efc1ac269518d0cc202d57857794948103dd1454e8881be 76935188 cpython-3.13.18+20261026-x86_64-unknown-linux-gnu-install_only.tar.gz
+3.13 aarch64-unknown-linux-gnu b48451865bde9a39e2f3e71d7fdcbf1f32615f50f24d78dc50d04ede6501cf81 58894021 cpython-3.13.18+20261026-aarch64-unknown-linux-gnu-install_only.tar.gz
+3.14 x86_64-pc-windows-msvc 98bbe6a0d798bcbad142e96e5930a330e4dc407638e898b515c51eb73a27580d 51031912 cpython-3.14.10+20261026-x86_64-pc-windows-msvc-install_only.tar.gz
+3.14 aarch64-apple-darwin 30a18bcb9ab75e485b4bf4e5d783dde165571e7e42c56dff47a2d2c5345183a4 26891793 cpython-3.14.10+20261026-aarch64-apple-darwin-install_only.tar.gz
+3.14 x86_64-apple-darwin 01cedae5d4a66ac570e13cb35fa570d0e79ba8e9affd4518a5d85b6c2b98ff10 27054861 cpython-3.14.10+20261026-x86_64-apple-darwin-install_only.tar.gz
+3.14 x86_64-unknown-linux-gnu 1b38024924eb7f4cf0cab45d7b871d1f1991354190fccd2625ac7529a43786e2 76564514 cpython-3.14.10+20261026-x86_64-unknown-linux-gnu-install_only.tar.gz
+3.14 aarch64-unknown-linux-gnu dcc31ce7b9ddbbffac160da7fff0cc069054f43eca52382a7d0eebf94e985b88 58805984 cpython-3.14.10+20261026-aarch64-unknown-linux-gnu-install_only.tar.gz
+3.15 x86_64-pc-windows-msvc 17769f04c4c8c228e9fb838a37d92f6a6401b170c5cd27fb3073f233f73bb2f9 53107795 cpython-3.15.2+20261026-x86_64-pc-windows-msvc-install_only.tar.gz
+3.15 aarch64-apple-darwin 285a6b924713bec9c1cdf442ba5ebfbafbab070060b34d607c30546b758e64a6 27888331 cpython-3.15.2+20261026-aarch64-apple-darwin-install_only.tar.gz
+3.15 x86_64-apple-darwin c09fb50147ca9743a6d21e765d6243d8a21da04aed2d83b74f5a5c164d8d85bc 28042617 cpython-3.15.2+20261026-x86_64-apple-darwin-install_only.tar.gz
+3.15 x86_64-unknown-linux-gnu 08d4ae9024a7cfbd3b70e559241afa2571cd3208d7bd5f96f88e0080dd4092aa 82941798 cpython-3.15.2+20261026-x86_64-unknown-linux-gnu-install_only.tar.gz
+3.15 aarch64-unknown-linux-gnu 6fc73e8a4c80a65d2a0ed21535c65383f7b9f96bb58a5f40ed035bd7ee318616 63596086 cpython-3.15.2+20261026-aarch64-unknown-linux-gnu-install_only.tar.gz
