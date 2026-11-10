@@ -55,7 +55,8 @@ Proceed? [y/N]
 
 | Option | Effect |
 | --- | --- |
-| `--tests` | Also fetch the test fixtures into `photonscore/lib/d7/test/data/`. |
+| `--tests` | Also fetch the test fixtures from [files.photonscore.de](https://files.photonscore.de/data/d7-tests/) into `photonscore/lib/d7/test/data/`. |
+| `--fixtures-from DIR_OR_URL` | Take the fixtures from elsewhere; they are checked all the same. |
 | `--no-dotnet` | Skip .NET: the native library only. |
 | `--yes` | Download without asking, as CI does. |
 
