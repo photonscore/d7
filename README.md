@@ -1,10 +1,15 @@
 # D7 — the `.photons` file format
 
 D7 is [Photonscore](https://www.photonscore.de)'s on-disk format for
-time-resolved single-photon data (`.photons` files). This repository is the
-open-source reference implementation of the native D7 reader/writer for the
-"seven" container, without the legacy HDF5 / SQLite / directory-bundle /
-QAdata backends.
+time-resolved single-photon data (`.photons` files). This repository is its
+open-source reference implementation, for the "seven" container (without the
+legacy HDF5 / SQLite / directory-bundle / QAdata backends), three ways:
+
+- the native C++ library, with a C API and its shared library;
+- `Photonscore.D7`, a managed reader and writer for .NET, on NuGet;
+- `photonscore-d7`, Python bindings over the native library, on PyPI.
+
+All three read and write the same files, byte for byte.
 
 Every dependency of the C++ library is vendored under
 [`third_party/`](third_party). What is not, `configure.py` fetches: protoc
@@ -137,7 +142,7 @@ on Windows, `msbuild` builds `d7_test.exe` too:
 mkdir out\test-run && cd out\test-run && ..\x64\Release\d7_test.exe
 ```
 
-The .NET tests also read a real recording,
+The .NET tests read a real recording as well,
 [`d7.photons`](photonscore/lib/d7/test/data/d7.photons) (3.1 MB,
 LnTCapture, 2019):
 
@@ -225,6 +230,7 @@ photonscore/
     mmap/     memory-mapped file helpers
     path/     path manipulation
     d7/       the D7 reader/writer + C API + seven.proto
+      test/   the C++ tests, and test/data/d7.photons
   proto/      shared protobuf definitions (base.proto)
 examples/     C++ and C-API usage examples (write_demo, list_metadata, read_n_events)
 dotnet/
@@ -238,6 +244,7 @@ third_party/
   fmt/        {fmt} formatting library      (MIT)
   oneTBB/     Intel oneAPI TBB              (Apache-2.0)
   protobuf/   Protocol Buffers runtime      (BSD-3-Clause)
+  googletest/ GoogleTest, for the C++ tests (BSD-3-Clause)
   dotnet/     the .NET SDK, when configure.py fetched one (not tracked)
   python/     PINS, and the CPythons bootstrap fetched (not tracked)
 msvc/         Visual Studio projects of d7.sln
@@ -245,6 +252,8 @@ bootstrap.*   relocatable CPythons into third_party/python/
 env.*         the checkout's Python and dotnet on PATH, caches inside
 configure.py  downloads, gen/ and the Visual Studio setup
 Makefile      the Linux and macOS build
+VERSION.txt   the version of every package built here
+.github/      CI on three systems; release.yaml publishes on a v* tag
 out/          everything built (not tracked)
 ```
 
@@ -288,7 +297,7 @@ after another. `FileEntry` is a `oneof` of four payloads:
 - **`Data`** — one encoded page of a single dataset (see
   [Differential encoding](#differential-encoding) below). Pages are ~16 KB
   (`kBytesPerPage`); large appends are encoded page-by-page, in parallel via
-  oneTBB.
+  oneTBB, and reads decode pages in a oneTBB pipeline.
 - **`Index`** — a map from `dataset_id` to the byte `offset` of a run of
   pages, plus any attributes set over that span (see below).
 - **`Epilogue`** — the final entry: `global_index_offset` and the signature
@@ -372,12 +381,17 @@ has two strategies:
 
 ## Relationship to the Photonscore monorepo
 
-This code was extracted from Photonscore's internal `zoo` monorepo
-and pruned to the minimal set of sources
-needed to build the library and examples. Everything the code depends on is
-vendored under `third_party/`; there are no external, non-vendored
-dependencies (in particular, the Boost usage from the monorepo lived only in
-now-removed, unused utility code).
+The sources here come from Photonscore's internal monorepo, `zoo`, which
+stays their origin: the C++ library, the .NET library and their tests are
+copied from it, under this repository's license header, and kept in step
+by hand. [`VERSION.txt`](VERSION.txt) is zoo's version at the last sync,
+or a patch above it for a release of this repository's own. What has no
+counterpart there is this repository's: the build (`configure.py`, the
+Makefile, `d7.sln`), the bootstrap, the Python package, the examples and
+the workflows.
+
+Pull requests are welcome. A change to a copied source is carried into
+zoo by hand and comes back here with the next sync.
 
 ## License
 
