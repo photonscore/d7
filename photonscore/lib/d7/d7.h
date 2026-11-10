@@ -20,6 +20,8 @@
 #include "photonscore/lib/d7/open_options.h"
 #include "photonscore/lib/d7/vault.h"
 
+#include <memory>
+
 namespace photonscore {
 namespace d7 {
 
