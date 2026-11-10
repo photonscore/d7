@@ -30,6 +30,7 @@ import shutil
 import subprocess
 import sys
 import tarfile
+import urllib.error
 import urllib.request
 import zipfile
 
@@ -104,7 +105,7 @@ DOTNET = {
 }
 
 # Where the fixtures are published; --fixtures-from overrides it.
-FIXTURES_URL = ""
+FIXTURES_URL = "https://files.photonscore.de/data/d7-tests"
 # The test fixtures: size, SHA-256.
 FIXTURES = {
   "d7.photons": (3145766,
@@ -188,14 +189,19 @@ class Download:
       shutil.copyfile(self.url, path)
     else:
       print("Downloading " + self.url)
-      with urllib.request.urlopen(self.url) as r, open(path, "wb") as f:
-        done, shown = 0, 0
-        for block in iter(lambda: r.read(1 << 20), b""):
-          f.write(block)
-          done += len(block)
-          if self.size > 50 << 20 and done * 10 // self.size > shown:
-            shown = done * 10 // self.size
-            print("  {}%".format(shown * 10), flush=True)
+      try:
+        with urllib.request.urlopen(self.url) as r, open(path, "wb") as f:
+          done, shown = 0, 0
+          for block in iter(lambda: r.read(1 << 20), b""):
+            f.write(block)
+            done += len(block)
+            if self.size > 50 << 20 and done * 10 // self.size > shown:
+              shown = done * 10 // self.size
+              print("  {}%".format(shown * 10), flush=True)
+      except (urllib.error.URLError, OSError) as e:
+        if os.path.isfile(path):
+          os.remove(path)
+        fail("downloading {} failed: {}".format(self.url, e))
     got = sha(self.algorithm, path)
     if got != self.digest:
       os.remove(path)
@@ -327,8 +333,8 @@ def fixtures(source):
     if os.path.isfile(dst) and sha("sha256", dst) == digest:
       continue
     if not source:
-      fail("the fixtures are not published yet; pass --fixtures-from "
-           "with a folder or URL holding " + ", ".join(FIXTURES))
+      fail("no fixture source: pass --fixtures-from with a folder or URL "
+           "holding " + ", ".join(FIXTURES))
     if os.path.isdir(source):
       url = os.path.join(source, name)
     else:
