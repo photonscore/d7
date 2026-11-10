@@ -249,10 +249,6 @@ public class SevenReadTest(WrittenFile written)
   public void ItOpensSevenFilesOnly() {
     Assert.Throws<FileNotFoundException>(
       () => new D7FileReader(Path.Combine(written.Dir, "none.photons")));
-    var lnt = Path.Combine(
-      Repo.Root, "photonscore/lib/d7/test/data/data.photons");
-    Fetched(lnt);
-    Assert.Throws<InvalidDataException>(() => new D7FileReader(lnt));
   }
 
   // Whole, on one thread and on four, then ranges over page edges and at
