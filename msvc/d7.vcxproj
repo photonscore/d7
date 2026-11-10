@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- libd7: D7 with protobuf's runtime, oneTBB and fmt, as one static lib. -->
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Import Project="config.props" />
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6B1D2A8E-3C47-4F59-9E21-7D0A5C3B1E01}</ProjectGuid>
+    <RootNamespace>d7</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <TargetName>libd7</TargetName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="common.props" />
+
+  <!-- Objects keep their source folders: several sources share a name. -->
+  <ItemGroup>
+    <ClCompile Include="..\photonscore\lib\**\*.cc"
+               Exclude="..\photonscore\lib\d7\c_api.cc">
+      <ObjectFileName>$(IntDir)d7\%(RecursiveDir)</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\gen\**\*.pb.cc">
+      <ObjectFileName>$(IntDir)gen\%(RecursiveDir)</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\third_party\protobuf\src\google\protobuf\**\*.cc">
+      <ObjectFileName>$(IntDir)protobuf\%(RecursiveDir)</ObjectFileName>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+    </ClCompile>
+    <ClCompile Include="..\third_party\oneTBB\src\tbb\*.cpp">
+      <ObjectFileName>$(IntDir)tbb\</ObjectFileName>
+      <PreprocessorDefinitions>__TBB_BUILD;__TBB_DYNAMIC_LOAD_ENABLED=0;__TBB_SOURCE_DIRECTLY_INCLUDED=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+    </ClCompile>
+    <ClCompile Include="..\third_party\fmt\fmt\*.cc">
+      <ObjectFileName>$(IntDir)fmt\</ObjectFileName>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+    </ClCompile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ClInclude Include="..\photonscore\lib\**\*.h" />
+  </ItemGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

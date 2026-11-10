@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- photonscore_d7.dll: the C API (c_api.h) over libd7. -->
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Import Project="config.props" />
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6B1D2A8E-3C47-4F59-9E21-7D0A5C3B1E02}</ProjectGuid>
+    <RootNamespace>photonscore_d7</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="common.props" />
+
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>PSCR_D7_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
+  <ItemGroup>
+    <ClCompile Include="..\photonscore\lib\d7\c_api.cc" />
+    <ClInclude Include="..\photonscore\lib\d7\c_api.h" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="d7.vcxproj">
+      <Project>{6B1D2A8E-3C47-4F59-9E21-7D0A5C3B1E01}</Project>
+    </ProjectReference>
+  </ItemGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>
