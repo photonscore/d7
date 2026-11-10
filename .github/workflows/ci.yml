@@ -1,0 +1,66 @@
+# Builds and tests d7 the way the README says, on all three systems: the
+# bootstrap's Python, configure.py, make or MSBuild, and dotnet.
+# The .NET tests read published fixtures: they run once the repository
+# variable D7_FIXTURES_URL names where those live.
+
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  # Never empty: Windows drops an empty variable, and CMD then passes
+  # "%CONFIGURE_ARGS%" through as it stands.
+  CONFIGURE_ARGS: >-
+    ${{ vars.D7_FIXTURES_URL
+    && format('--yes --tests --fixtures-from {0}', vars.D7_FIXTURES_URL)
+    || '--yes' }}
+
+jobs:
+  unix:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bootstrap Python
+        run: ./bootstrap.sh --yes
+      - name: Configure
+        run: . ./env.sh && python configure.py $CONFIGURE_ARGS
+      - name: Build
+        run: make -j4
+      - name: C++ tests
+        run: make test
+      - name: .NET build
+        run: . ./env.sh && dotnet build dotnet/Test.D7
+      - name: .NET tests
+        if: vars.D7_FIXTURES_URL != ''
+        run: . ./env.sh && dotnet test dotnet/Test.D7 --no-build
+
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - uses: actions/checkout@v4
+      - uses: microsoft/setup-msbuild@v2
+      - name: Bootstrap Python
+        run: .\bootstrap.cmd --yes
+      - name: Configure
+        run: call .\env.cmd && python configure.py %CONFIGURE_ARGS%
+      - name: Build
+        run: msbuild d7.sln -m -p:Configuration=Release -p:Platform=x64
+      - name: C++ tests
+        run: mkdir out\test-run && cd out\test-run && ..\x64\Release\d7_test.exe
+      - name: .NET build
+        run: call .\env.cmd && dotnet build dotnet\Test.D7
+      - name: .NET tests
+        if: vars.D7_FIXTURES_URL != ''
+        run: call .\env.cmd && dotnet test dotnet\Test.D7 --no-build
