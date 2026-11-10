@@ -114,7 +114,7 @@ int main(int argc, char **argv) {
     }
     printf("[");
     for (int i = 0; i < di->rank; i++) {
-      printf("%zu", di->size[i]);
+      printf("%lld", (long long)di->size[i]);
       if (i < (di->rank - 1)) {
         printf(", ");
       }
