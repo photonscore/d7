@@ -3,12 +3,12 @@
 /gen/
 /msvc/local.props
 /third_party/dotnet/
+/photonscore/lib/d7/test/data/*.photons
 
-# make
-/build/
+# Everything built: make, MSBuild and dotnet
+/out/
 
-# MSBuild and Visual Studio
-/msvc/obj/
+# Visual Studio
 .vs/
 *.user
 
@@ -16,11 +16,3 @@
 .DS_Store
 ._*
 *~
-
-# Test fixtures, fetched by configure.py
-/photonscore/lib/d7/test/data/*.photons
-
-# dotnet
-bin/
-obj/
-/.dotnet/

@@ -17,7 +17,7 @@
 
 CXX ?= c++
 CXXFLAGS ?= -O2
-BUILD := build
+BUILD := out
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)

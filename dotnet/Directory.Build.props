@@ -8,6 +8,8 @@
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- bin/ and obj/ of every project under out/dotnet/ -->
+    <ArtifactsPath>$(MSBuildThisFileDirectory)../out/dotnet</ArtifactsPath>
   </PropertyGroup>
 
 </Project>

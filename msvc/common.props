@@ -4,8 +4,8 @@
 
   <PropertyGroup>
     <D7Root>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)..'))</D7Root>
-    <OutDir>$(D7Root)build\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(MSBuildThisFileDirectory)obj\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(D7Root)out\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(D7Root)out\obj\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
 
   <ItemDefinitionGroup>
