@@ -1,11 +1,15 @@
 # Builds and tests d7 the way the README says, on all three systems: the
-# bootstrap's Python, configure.py, make or MSBuild, and dotnet.
+# bootstrap's Python, configure.py, make or MSBuild, dotnet, and the
+# Python wheels, which it keeps as artifacts. release.yaml runs it too,
+# and publishes those wheels only when all of it passed.
 
 name: ci
 
 on:
   push:
+    branches: ['**']
   pull_request:
+  workflow_call:
 
 permissions:
   contents: read
@@ -17,6 +21,9 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
+    env:
+      # The macOS wheel says 11.0; the library must be built for it
+      MACOSX_DEPLOYMENT_TARGET: '11.0'
     steps:
       - uses: actions/checkout@v4
       - name: Bootstrap Python
@@ -29,6 +36,48 @@ jobs:
         run: make test
       - name: .NET tests
         run: . ./env.sh && dotnet test dotnet/Test.D7
+      - name: Python wheel
+        run: . ./env.sh && python python/d7_build.py out/wheels
+      - name: Python tests
+        run: |
+          . ./env.sh
+          python -m venv out/venv
+          out/venv/bin/python -m pip install --no-cache-dir --only-binary=:all: out/wheels/*.whl pytest
+          out/venv/bin/python -m pytest -p no:cacheprovider --basetemp=out/pytest python/tests
+      - name: Keep the macOS wheel
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheel-macos
+          path: out/wheels/*.whl
+
+  # The Linux wheel PyPI gets: built against glibc 2.28, checked by
+  # auditwheel, tested on every Python the image has from 3.11 on.
+  manylinux:
+    runs-on: ubuntu-latest
+    container: quay.io/pypa/manylinux_2_28_x86_64
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: /opt/python/cp312-cp312/bin/python configure.py --yes --no-dotnet
+      - name: Build the library
+        run: make -j4 out/libphotonscore_d7.so
+      - name: Wheel
+        run: |
+          /opt/python/cp312-cp312/bin/python python/d7_build.py out/raw
+          auditwheel repair --plat manylinux_2_28_x86_64 -w out/wheels out/raw/*.whl
+      - name: Python tests
+        run: |
+          for py in /opt/python/cp31[1-9]-cp31[1-9]/bin/python; do
+            rm -rf out/venv
+            $py -m venv out/venv
+            out/venv/bin/python -m pip install --no-cache-dir --only-binary=:all: out/wheels/*.whl pytest
+            out/venv/bin/python -m pytest -p no:cacheprovider --basetemp=out/pytest python/tests
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheel-linux
+          path: out/wheels/*.whl
 
   windows:
     runs-on: windows-latest
@@ -48,3 +97,15 @@ jobs:
         run: mkdir out\test-run && cd out\test-run && ..\x64\Release\d7_test.exe
       - name: .NET tests
         run: call .\env.cmd && dotnet test dotnet\Test.D7
+      - name: Python wheel
+        run: call .\env.cmd && python python\d7_build.py out\wheels
+      - name: Python tests
+        run: |
+          call .\env.cmd
+          python -m venv out\venv
+          for %%w in (out\wheels\*.whl) do out\venv\Scripts\python -m pip install --no-cache-dir --only-binary=:all: %%w pytest
+          out\venv\Scripts\python -m pytest -p no:cacheprovider --basetemp=out/pytest python/tests
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheel-windows
+          path: out/wheels/*.whl
