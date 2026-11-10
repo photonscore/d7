@@ -15,6 +15,31 @@ else.
 
 ## Building
 
+### Without a Python of your own
+
+`bootstrap.sh` (Linux, macOS) and `bootstrap.cmd` (Windows) fetch
+relocatable CPythons from
+[python-build-standalone](https://github.com/astral-sh/python-build-standalone),
+pinned by release and SHA-256 in
+[`third_party/python/PINS`](third_party/python/PINS), into
+`third_party/python/<X.Y>/`. They ask first, as `configure.py` does:
+
+```sh
+./bootstrap.sh                 # 3.12; --all for 3.11 to 3.15, --yes for CI
+third_party/python/3.12/bin/python configure.py
+```
+
+```bat
+.\bootstrap.cmd
+third_party\python\3.12\python.exe configure.py
+```
+
+`. ./env.sh` (Bash, zsh) or `env.cmd` then put the checkout's Python
+(`D7_PYTHON`, default 3.12) and dotnet first on `PATH`, and keep
+dotnet's own caches in `.cache/` too.
+
+### configure.py
+
 Run `configure.py` once per checkout. It needs Python 3.9 or later and
 nothing beyond the standard library. It lists what it would download,
 with sizes, and asks before fetching anything:
@@ -151,7 +176,10 @@ third_party/
   oneTBB/     Intel oneAPI TBB              (Apache-2.0)
   protobuf/   Protocol Buffers runtime      (BSD-3-Clause)
   dotnet/     the .NET SDK, when configure.py fetched one (not tracked)
+  python/     PINS, and the CPythons bootstrap fetched (not tracked)
 msvc/         Visual Studio projects of d7.sln
+bootstrap.*   relocatable CPythons into third_party/python/
+env.*         the checkout's Python and dotnet on PATH, caches inside
 configure.py  downloads, gen/ and the Visual Studio setup
 Makefile      the Linux and macOS build
 out/          everything built (not tracked)
