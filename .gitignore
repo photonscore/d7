@@ -4,7 +4,6 @@
 /msvc/local.props
 /third_party/dotnet/
 /third_party/python/*/
-/photonscore/lib/d7/test/data/*.photons
 
 # Everything built: make, MSBuild and dotnet
 /out/
