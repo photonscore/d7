@@ -25,12 +25,16 @@ dotnet add package Photonscore.D7
 
 Its [README](dotnet/Photonscore.D7/README.md) shows reading and writing.
 
-**Python**: `photonscore-d7` on PyPI, with NumPy as its only dependency.
-It is not published yet; once it is:
+**Python**: [photonscore-d7](https://pypi.org/project/photonscore-d7/)
+on PyPI, the native library inside, NumPy its only dependency; one
+wheel per platform (Windows x64, macOS on Apple silicon, Linux x86_64)
+for every Python 3:
 
 ```sh
 pip install photonscore-d7
 ```
+
+Its [README](python/README.md) shows reading and writing.
 
 **C and C++**: build from source, below. The C API
 ([`c_api.h`](photonscore/lib/d7/c_api.h)) and its shared library suit
@@ -141,6 +145,22 @@ LnTCapture, 2019):
 dotnet test dotnet/Test.D7
 ```
 
+### The Python wheel
+
+`python/d7_build.py` packs the built shared library with the
+`photonscore_d7` package into a wheel; `pip install .` does the same
+through it. The tests read `d7.photons` too:
+
+```sh
+python python/d7_build.py out/wheels
+python -m pip install out/wheels/*.whl pytest
+python -m pytest --basetemp=out/pytest python/tests
+```
+
+On macOS, build the library with `MACOSX_DEPLOYMENT_TARGET=11.0`, which
+the wheel's tag names. PyPI's Linux wheel is built in the manylinux_2_28
+image and checked by `auditwheel` (`.github/workflows/ci.yml`).
+
 ## Using the library
 
 Link `libd7` (above) and include the umbrella header
@@ -210,6 +230,10 @@ examples/     C++ and C-API usage examples (write_demo, list_metadata, read_n_ev
 dotnet/
   Photonscore.D7/  the managed reader and writer (net8.0, net10.0)
   Test.D7/         its tests
+python/
+  photonscore_d7/  the Python package, ctypes over the C API
+  tests/           its tests
+  d7_build.py      the wheel builder, and pyproject.toml's backend
 third_party/
   fmt/        {fmt} formatting library      (MIT)
   oneTBB/     Intel oneAPI TBB              (Apache-2.0)
