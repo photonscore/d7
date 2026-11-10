@@ -1,9 +1,6 @@
 # Publishes a release: a tag v<VERSION.txt> pushes Photonscore.D7 to
 # nuget.org by trusted publishing, no stored key. The PyPI job joins when
 # the Python package exists (photonscore-d7, environment pypi).
-#
-# The repository variable NUGET_USER holds the nuget.org account name
-# whose trusted-publishing policy names this workflow file.
 
 name: release
 
@@ -43,7 +40,8 @@ jobs:
         id: login
         uses: NuGet/login@v1
         with:
-          user: ${{ vars.NUGET_USER }}
+          # The account whose trusted-publishing policy names this file
+          user: yprokazov
       - name: Push
         run: >-
           . ./env.sh &&
