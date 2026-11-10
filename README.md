@@ -6,59 +6,59 @@ open-source reference implementation of the native D7 reader/writer for the
 "seven" container, without the legacy HDF5 / SQLite / directory-bundle /
 QAdata backends.
 
-It is a **pure Bazel project** — every dependency is vendored under
-[`third_party/`](third_party). There is no `configure` step and no network
-access is required to build.
+Every dependency is vendored under [`third_party/`](third_party). The one
+thing fetched is `protoc`, which `configure.py` downloads at the exact
+version of the vendored protobuf runtime and checks against a pinned
+SHA-256.
 
 ## Building
 
-Requires [Bazel](https://bazel.build) (the pinned version is in
-[`.bazelversion`](.bazelversion); [bazelisk](https://github.com/bazelbuild/bazelisk)
-will pick it up automatically).
+Run `configure.py` once per checkout. It needs Python 3.9 or later and
+nothing beyond the standard library. It fetches protoc into `.cache/`,
+generates the protobuf code into `gen/`, and on Windows sets the projects
+up for the Visual Studio it finds.
+
+**Linux and macOS** need a C++17 compiler and GNU make:
 
 ```sh
-bazel build //photonscore/lib/d7:d7
+python3 configure.py
+make -j8
 ```
 
-This produces the static library `bazel-bin/photonscore/lib/d7/libd7.a`.
+**Windows** needs Visual Studio 2019 or later with the C++ desktop
+workload:
 
-Build everything (library, C API, shared library, examples, vendored deps):
-
-```sh
-bazel build //...
+```bat
+python configure.py
+msbuild d7.sln -m -p:Configuration=Release -p:Platform=x64
 ```
+
+`d7.sln` opens in Visual Studio as well. Everything lands in `build/`
+(`build\x64\Release\` on Windows):
+
+| Output | What it is |
+| --- | --- |
+| `libd7.a` / `libd7.lib` | Static library: D7 together with the protobuf runtime, oneTBB and fmt. |
+| `libphotonscore_d7.so` / `.dylib`, `photonscore_d7.dll` | Shared library exporting the `pscr_d7_*` C API ([`c_api.h`](photonscore/lib/d7/c_api.h)). |
+| `write_demo` | C++: create a small sample `.photons` file. |
+| `list_metadata` | C++: print a file's datasets and attributes. |
+| `read_n_events` | C++: read the first N events of a file. |
+| `list_metadata_c_api` | `list_metadata` again, over the C API and the shared library. |
+| `read_n_events_c_api` | `read_n_events` again, over the C API and the shared library. |
 
 ### Run the examples
 
-Write a small sample file, then inspect and read it back:
+Write a small sample file, then inspect it and read it back:
 
 ```sh
-bazel run //examples:write_demo    -- /tmp/sample.photons
-bazel run //examples:list_metadata -- /tmp/sample.photons
-bazel run //examples:read_n_events -- /tmp/sample.photons 5
+build/write_demo    /tmp/sample.photons
+build/list_metadata /tmp/sample.photons
+build/read_n_events /tmp/sample.photons 5
 ```
-
-## Targets
-
-| Target | What it is |
-| --- | --- |
-| `//photonscore/lib/d7:d7` | The core C++ static library. |
-| `//photonscore/lib/d7:c_api` | Static library exposing the `pscr_d7_*` C ABI (`c_api.h`). |
-| `//photonscore/lib/d7:photonscore_d7` | Shared library (`.dylib`/`.so`) of the C API. |
-| `//photonscore/lib/d7:photonscore_d7_import` | `cc_import` for linking against the shared library. |
-| `//examples:write_demo` | C++: create a small sample `.photons` file. |
-| `//examples:list_metadata` | C++: print a file's datasets and attributes. |
-| `//examples:read_n_events` | C++: read the first N events of a file. |
-| `//examples:list_metadata_c_api` | Same as `list_metadata`, but via the C ABI + shared library. |
-| `//examples:read_n_events_c_api` | Same as `read_n_events`, but via the C ABI + shared library. |
-
-Each example comes in two flavours: a native C++ version
-([`examples/`](examples), linking `//photonscore/lib/d7`) and a `_c_api`
-version written against the C ABI and the shared library.
 
 ## Using the library
 
-Depend on `//photonscore/lib/d7:d7` and include the umbrella header
+Link `libd7` (above) and include the umbrella header
 [`d7.h`](photonscore/lib/d7/d7.h). A vault is created/opened with `Open`, then
 written with `CreateDataset`/`Append` or read with `Read`:
 
@@ -125,9 +125,10 @@ examples/     C++ and C-API usage examples (write_demo, list_metadata, read_n_ev
 third_party/
   fmt/        {fmt} formatting library      (MIT)
   oneTBB/     Intel oneAPI TBB              (Apache-2.0)
-  protobuf/   Protocol Buffers + protoc     (BSD-3-Clause)
-tools/build/
-  proto.bzl   minimal C++ protobuf codegen rule
+  protobuf/   Protocol Buffers runtime      (BSD-3-Clause)
+msvc/         Visual Studio projects of d7.sln
+configure.py  protoc, gen/ and the Visual Studio setup
+Makefile      the Linux and macOS build
 ```
 
 ## File format
@@ -255,7 +256,7 @@ has two strategies:
 ## Relationship to the Photonscore monorepo
 
 This code was extracted from Photonscore's internal `zoo` monorepo
-(`//photonscore/lib/d7:light`) and pruned to the minimal set of sources
+and pruned to the minimal set of sources
 needed to build the library and examples. Everything the code depends on is
 vendored under `third_party/`; there are no external, non-vendored
 dependencies (in particular, the Boost usage from the monorepo lived only in
