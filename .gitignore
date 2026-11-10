@@ -2,6 +2,7 @@
 /.cache/
 /gen/
 /msvc/local.props
+/third_party/dotnet/
 
 # make
 /build/
