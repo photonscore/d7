@@ -1,7 +1,17 @@
-# Bazel
-/bazel-*
+# configure.py
+/.cache/
+/gen/
+/msvc/local.props
+
+# make
+/build/
+
+# MSBuild and Visual Studio
+/msvc/obj/
+.vs/
+*.user
+
 .*.swp
 .DS_Store
 ._*
 *~
-.vs/

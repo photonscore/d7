@@ -1,7 +1,7 @@
 -xc++
 -std=c++17
 -I.
--Ibazel-bin
+-Igen
 -isystem
 third_party/fmt
 -isystem
