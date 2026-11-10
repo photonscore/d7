@@ -1,0 +1,3 @@
+# CMD parses labels and blocks reliably only with CRLF; shells need LF.
+*.cmd text eol=crlf
+*.sh text eol=lf
