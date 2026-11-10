@@ -34,7 +34,7 @@ third_party/python/3.12/bin/python configure.py
 third_party\python\3.12\python.exe configure.py
 ```
 
-`. ./env.sh` (Bash, zsh) or `env.cmd` then put the checkout's Python
+`. ./env.sh` (Bash, zsh) or `.\env.cmd` then put the checkout's Python
 (`D7_PYTHON`, default 3.12) and dotnet first on `PATH`, and keep
 dotnet's own caches in `.cache/` too.
 
@@ -100,6 +100,21 @@ Write a small sample file, then inspect it and read it back:
 out/write_demo    /tmp/sample.photons
 out/list_metadata /tmp/sample.photons
 out/read_n_events /tmp/sample.photons 5
+```
+
+### Run the tests
+
+The C++ tests (googletest) need no fixtures. `make test` runs them in a
+fresh `out/test-run/`; on Windows, `msbuild` builds `d7_test.exe` too:
+
+```bat
+mkdir out\test-run && cd out\test-run && ..\x64\Release\d7_test.exe
+```
+
+The .NET tests read the fixtures that `configure.py --tests` fetches:
+
+```sh
+dotnet test dotnet/Test.D7
 ```
 
 ## Using the library
