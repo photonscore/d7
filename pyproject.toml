@@ -1,0 +1,7 @@
+# photonscore-d7 is built by python/d7_build.py, which packs the shared
+# library a checkout has built (README.md, Python); its metadata is there.
+
+[build-system]
+requires = []
+build-backend = "d7_build"
+backend-path = ["python"]
