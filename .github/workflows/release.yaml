@@ -1,6 +1,6 @@
-# Publishes a release: a tag v<VERSION.txt> pushes Photonscore.D7 to
-# nuget.org by trusted publishing, no stored key. The PyPI job joins when
-# the Python package exists (photonscore-d7, environment pypi).
+# Publishes a release: a tag v<VERSION.txt> runs all of ci.yml, and only
+# when that passed pushes Photonscore.D7 to nuget.org and the three
+# wheels ci.yml kept to PyPI, both by trusted publishing, no stored key.
 
 name: release
 
@@ -12,12 +12,8 @@ permissions:
   contents: read
 
 jobs:
-  nuget:
+  tag:
     runs-on: ubuntu-latest
-    environment: nuget
-    permissions:
-      contents: read
-      id-token: write
     steps:
       - uses: actions/checkout@v4
       - name: The tag is VERSION.txt
@@ -26,12 +22,24 @@ jobs:
             echo "tag $GITHUB_REF_NAME, VERSION.txt $(cat VERSION.txt)" >&2
             exit 1
           }
+
+  ci:
+    needs: tag
+    uses: ./.github/workflows/ci.yml
+
+  nuget:
+    needs: ci
+    runs-on: ubuntu-latest
+    environment: nuget
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
       - name: Bootstrap Python
         run: ./bootstrap.sh --yes
       - name: Configure
         run: . ./env.sh && python configure.py --yes
-      - name: Test
-        run: . ./env.sh && dotnet test dotnet/Test.D7 -c Release
       - name: Pack
         run: >-
           . ./env.sh &&
@@ -48,3 +56,19 @@ jobs:
           dotnet nuget push "out/nuget/*.nupkg"
           --api-key "${{ steps.login.outputs.NUGET_API_KEY }}"
           --source https://api.nuget.org/v3/index.json
+
+  pypi:
+    needs: ci
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wheel-*
+          merge-multiple: true
+          path: dist
+      - name: The three wheels
+        run: ls -l dist && test "$(ls dist/*.whl | wc -l)" = 3
+      - uses: pypa/gh-action-pypi-publish@release/v1
